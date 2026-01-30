@@ -1,0 +1,6 @@
+HTTP/1.1 201 Created
+Content-Type: application/json
+Date: Fri, 30 Jan 2026 06:54:57 GMT
+Content-Length: 152
+
+{"event":{"type":"user_registered","payload":{"email":"test@example.com","user_id":1},"timestamp":"2026-01-30T06:54:56.606256295Z"},"status":"success"}

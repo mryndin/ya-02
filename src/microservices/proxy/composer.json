@@ -1,0 +1,14 @@
+{
+    "name": "cinema-abyss/proxy",
+    "description": "API Gateway with Strangler Fig pattern",
+    "type": "project",
+    "require": {
+        "php": "^8.1",
+        "guzzlehttp/guzzle": "^7.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}
