@@ -1,0 +1,41 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Container Diagram for CinemaAbyss (To-Be Architecture)
+
+Person(user, "Пользователь", "Клиент (Mobile, Web, Smart TV)")
+
+System_Boundary(c1, "CinemaAbyss System") {
+    
+    Container(proxy, "API Gateway (Proxy)", "Go/Nginx", "Единая точка входа. Маршрутизация запросов и миграция трафика (Strangler Fig).")
+    
+    Container(monolith, "Monolith Service", "Go", "Управление пользователями, платежами, подписками.")
+    Container(movies, "Movies Service", "Go", "Управление метаданными фильмов (Жанры, Описания, Рейтинги).")
+    Container(events, "Events Service", "Go", "Обработка событий системы (просмотры, оплаты). Producer/Consumer.")
+    
+    ContainerQueue(kafka, "Apache Kafka", "Message Broker", "Асинхронная шина событий (UserEvents, MovieEvents, PaymentEvents).")
+    
+    ContainerDb(db, "PostgreSQL", "Relational Database", "Хранение данных. Логически разделенные схемы для сервисов.")
+}
+
+System_Ext(recSys, "Recommendation System", "Внешняя система рекомендаций")
+
+Rel(user, proxy, "HTTPS / JSON", "Использует API")
+
+' Маршрутизация Proxy
+Rel(proxy, movies, "HTTP / JSON", "/api/movies")
+Rel(proxy, events, "HTTP / JSON", "/api/events")
+Rel(proxy, monolith, "HTTP / JSON", "/api/users, /api/payments")
+
+' Взаимодействие с БД
+Rel(monolith, db, "SQL (TCP)", "R/W Users, Payments")
+Rel(movies, db, "SQL (TCP)", "R/W Movies Data")
+Rel(events, db, "SQL (TCP)", "Write Logs/Stats")
+
+' Взаимодействие с Kafka
+Rel(events, kafka, "TCP/Binary", "Produces & Consumes Events")
+
+' Интеграция с внешней системой (как описано в As-Is)
+Rel(monolith, recSys, "HTTP", "Запрос подборки")
+
+@enduml
